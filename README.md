@@ -33,15 +33,41 @@ Spug是面向中小型企业设计的轻量级无Agent的自动化运维平台�
 ## 环境
 
 * Python 3.6+
-* Django 2.2
-* Node 12.14
-* React 16.11
+* Django 2.2+
+* Node 12.14+
+* React 16.11+
 
 ## 安装
 
 [官方文档](https://spug.dev/docs/install/)
 
 更多使用帮助请参考 [使用文档](https://www.spug.dev/docs/host-manage/)。
+
+```bash
+#安装系统所需开发库
+sudo apt install -y libldap2-dev libsasl2-dev      #Ubuntu
+#sudo yum install -y openldap-devel libsasl2-devel #CentOS
+
+#编译前端文件
+cd spug_web/
+npm install --registry=https://registry.npm.taobao.org
+
+#更新pip和安装python依赖库
+cd ../spug_api/
+python -m venv venv
+source ./venv/bin/activate
+./venv/bin/python ./venv/bin/get-pip.py
+pip install -r ./requirements.txt
+
+#设置数据库和缓存连接，初始化数据库和添加管理员账号
+#参照同目录下的settings.py修改文件 spug_api/spug/overrides.py
+python manage.py updatedb
+python manage.py user add -u admin -p admin -s -n 管理员
+
+#配置nginx和supervisor
+#修改文件 spug_api/tools/nginx-spug.conf 放到 /etc/nginx/conf.d/spug.conf
+#修改文件 spug_api/tools/supervisor-spug.ini 放到 /etc/supervisor/conf.d/spug.ini
+```
 
 ## 推荐项目
 [Yearning — MYSQL 开源SQL语句审核平台](https://github.com/cookieY/Yearning)
