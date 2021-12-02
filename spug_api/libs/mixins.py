@@ -10,12 +10,16 @@ class ModelMixin(object):
     __slots__ = ()
 
     def to_dict(self, excludes: tuple = None, selects: tuple = None) -> dict:
-        if not hasattr(self, '_meta'):
-            raise TypeError('<%r> does not a django.db.models.Model object.' % self)
+        if not hasattr(self, "_meta"):
+            raise TypeError("<%r> does not a django.db.models.Model object." % self)
         elif selects:
             return {f: getattr(self, f) for f in selects}
         elif excludes:
-            return {f.attname: getattr(self, f.attname) for f in self._meta.fields if f.attname not in excludes}
+            return {
+                f.attname: getattr(self, f.attname)
+                for f in self._meta.fields
+                if f.attname not in excludes
+            }
         else:
             return {f.attname: getattr(self, f.attname) for f in self._meta.fields}
 
@@ -27,7 +31,7 @@ class ModelMixin(object):
 
 class AdminView(View):
     def dispatch(self, request, *args, **kwargs):
-        if hasattr(request, 'user') and request.user.is_supper:
+        if hasattr(request, "user") and request.user.is_supper:
             return super().dispatch(request, *args, **kwargs)
         else:
-            return json_response(error='权限拒绝')
+            return json_response(error="权限拒绝")

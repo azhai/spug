@@ -19,10 +19,10 @@ def date_validator(value: str) -> bool:
     value = value.strip()
     try:
         if len(value) == 10:
-            datetime.strptime(value, '%Y-%m-%d')
+            datetime.strptime(value, "%Y-%m-%d")
             return True
         elif len(value) == 19:
-            datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
             return True
     except ValueError:
         pass

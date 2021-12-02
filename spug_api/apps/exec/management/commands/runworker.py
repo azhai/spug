@@ -16,7 +16,7 @@ EXEC_WORKER_KEY = settings.EXEC_WORKER_KEY
 MONITOR_WORKER_KEY = settings.MONITOR_WORKER_KEY
 SCHEDULE_WORKER_KEY = settings.SCHEDULE_WORKER_KEY
 
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s %(message)s")
 
 
 class Worker:
@@ -28,10 +28,12 @@ class Worker:
         connections.close_all()
 
     def run(self):
-        logging.warning('Running worker')
+        logging.warning("Running worker")
         self.rds.delete(EXEC_WORKER_KEY, MONITOR_WORKER_KEY, SCHEDULE_WORKER_KEY)
         while True:
-            key, job = self.rds.blpop([EXEC_WORKER_KEY, SCHEDULE_WORKER_KEY, MONITOR_WORKER_KEY])
+            key, job = self.rds.blpop(
+                [EXEC_WORKER_KEY, SCHEDULE_WORKER_KEY, MONITOR_WORKER_KEY]
+            )
             key = key.decode()
             if key == SCHEDULE_WORKER_KEY:
                 future = self._executor.submit(schedule_worker_handler, job)
@@ -43,7 +45,7 @@ class Worker:
 
 
 class Command(BaseCommand):
-    help = 'Start worker process'
+    help = "Start worker process"
 
     def handle(self, *args, **options):
         w = Worker()

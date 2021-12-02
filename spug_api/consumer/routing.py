@@ -7,10 +7,12 @@ from consumer.middleware import AuthMiddleware
 from consumer.consumers import *
 
 ws_router = AuthMiddleware(
-    URLRouter([
-        path('ws/exec/<str:token>/', ExecConsumer),
-        path('ws/ssh/<int:id>/', SSHConsumer),
-        path('ws/<str:module>/<str:token>/', ComConsumer),
-        path('ws/notify/', NotifyConsumer),
-    ])
+    URLRouter(
+        [
+            path("ws/exec/<str:token>/", ExecConsumer),
+            path("ws/ssh/<int:id>/", SSHConsumer),
+            path("ws/<str:module>/<str:token>/", ComConsumer),
+            path("ws/notify/", NotifyConsumer),
+        ]
+    )
 )

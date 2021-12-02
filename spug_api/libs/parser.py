@@ -20,8 +20,17 @@ class Argument(object):
     :param bool required: is required
     """
 
-    def __init__(self, name, default=None, handler=None, required=True, type=str, filter=None, help=None,
-                 nullable=False):
+    def __init__(
+        self,
+        name,
+        default=None,
+        handler=None,
+        required=True,
+        type=str,
+        filter=None,
+        help=None,
+        nullable=False,
+    ):
         self.name = name
         self.default = default
         self.type = type
@@ -31,23 +40,25 @@ class Argument(object):
         self.help = help
         self.handler = handler
         if not isinstance(self.name, str):
-            raise TypeError('Argument name must be string')
+            raise TypeError("Argument name must be string")
         if filter and not callable(self.filter):
-            raise TypeError('Argument filter is not callable')
+            raise TypeError("Argument filter is not callable")
 
     def parse(self, has_key, value):
         if not has_key:
             if self.required and self.default is None:
                 raise ParseError(
-                    self.help or 'Required Error: %s is required' % self.name)
+                    self.help or "Required Error: %s is required" % self.name
+                )
             else:
                 return self.default
-        elif value in [u'', '', None]:
+        elif value in [u"", "", None]:
             if self.default is not None:
                 return self.default
             elif not self.nullable and self.required:
                 raise ParseError(
-                    self.help or 'Value Error: %s must not be null' % self.name)
+                    self.help or "Value Error: %s must not be null" % self.name
+                )
             else:
                 return None
         try:
@@ -56,18 +67,20 @@ class Argument(object):
                     value = json.loads(value)
                     assert isinstance(value, self.type)
                 elif self.type == bool and isinstance(value, str):
-                    assert value.lower() in ['true', 'false']
-                    value = value.lower() == 'true'
+                    assert value.lower() in ["true", "false"]
+                    value = value.lower() == "true"
                 elif not isinstance(value, self.type):
                     value = self.type(value)
         except (TypeError, ValueError, AssertionError):
-            raise ParseError(self.help or 'Type Error: %s type must be %s' % (
-                self.name, self.type))
+            raise ParseError(
+                self.help or "Type Error: %s type must be %s" % (self.name, self.type)
+            )
 
         if self.filter:
             if not self.filter(value):
                 raise ParseError(
-                    self.help or 'Value Error: %s filter check failed' % self.name)
+                    self.help or "Value Error: %s filter check failed" % self.name
+                )
         if self.handler:
             value = self.handler(value)
         return value
@@ -81,7 +94,7 @@ class BaseParser(object):
             if isinstance(e, str):
                 e = Argument(e)
             elif not isinstance(e, Argument):
-                raise TypeError('%r is not instance of Argument' % e)
+                raise TypeError("%r is not instance of Argument" % e)
             self.args.append(e)
 
     def _get(self, key):
@@ -119,12 +132,12 @@ class JsonParser(BaseParser):
     def _init(self, data):
         try:
             if isinstance(data, (str, bytes)):
-                data = data.decode('utf-8')
+                data = data.decode("utf-8")
                 self.__data = json.loads(data) if data else {}
             else:
-                assert hasattr(data, '__contains__')
-                assert hasattr(data, 'get')
+                assert hasattr(data, "__contains__")
+                assert hasattr(data, "get")
                 assert callable(data.get)
                 self.__data = data
         except (ValueError, AssertionError):
-            raise ParseError('Invalid data type for parse')
+            raise ParseError("Invalid data type for parse")

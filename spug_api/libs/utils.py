@@ -16,7 +16,7 @@ def human_datetime(date=None):
         assert isinstance(date, datetime)
     else:
         date = datetime.now()
-    return date.strftime('%Y-%m-%d %H:%M:%S')
+    return date.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # 转换时间格式到字符串(天)
@@ -25,7 +25,7 @@ def human_date(date=None):
         assert isinstance(date, datetime)
     else:
         date = datetime.now()
-    return date.strftime('%Y-%m-%d')
+    return date.strftime("%Y-%m-%d")
 
 
 def human_time(date=None):
@@ -33,7 +33,7 @@ def human_time(date=None):
         assert isinstance(date, datetime)
     else:
         date = datetime.now()
-    return date.strftime('%H:%M:%S')
+    return date.strftime("%H:%M:%S")
 
 
 # 解析时间类型的数据
@@ -42,10 +42,10 @@ def parse_time(value):
         return value
     if isinstance(value, str):
         if len(value) == 10:
-            return datetime.strptime(value, '%Y-%m-%d')
+            return datetime.strptime(value, "%Y-%m-%d")
         elif len(value) == 19:
-            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-    raise TypeError('Expect a datetime.datetime value')
+            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+    raise TypeError("Expect a datetime.datetime value")
 
 
 # 传两个时间得到一个时间差
@@ -54,23 +54,27 @@ def human_diff_time(time1, time2):
     time2 = parse_time(time2)
     delta = time1 - time2 if time1 > time2 else time2 - time1
     if delta.seconds < 60:
-        text = '%d秒' % delta.seconds
+        text = "%d秒" % delta.seconds
     elif delta.seconds < 3600:
-        text = '%d分' % (delta.seconds / 60)
+        text = "%d分" % (delta.seconds / 60)
     else:
-        text = '%d小时' % (delta.seconds / 3600)
-    return '%d天%s' % (delta.days, text) if delta.days else text
+        text = "%d小时" % (delta.seconds / 3600)
+    return "%d天%s" % (delta.days, text) if delta.days else text
 
 
-def json_response(data='', error=''):
+def json_response(data="", error=""):
     content = AttrDict(data=data, error=error)
     if error:
-        content.data = ''
-    elif hasattr(data, 'to_dict'):
+        content.data = ""
+    elif hasattr(data, "to_dict"):
         content.data = data.to_dict()
-    elif isinstance(data, (list, QuerySet)) and all([hasattr(item, 'to_dict') for item in data]):
+    elif isinstance(data, (list, QuerySet)) and all(
+        [hasattr(item, "to_dict") for item in data]
+    ):
         content.data = [item.to_dict() for item in data]
-    return HttpResponse(json.dumps(content, cls=DateTimeEncoder), content_type='application/json')
+    return HttpResponse(
+        json.dumps(content, cls=DateTimeEncoder), content_type="application/json"
+    )
 
 
 # 继承自dict，实现可以通过.来操作元素
@@ -92,9 +96,9 @@ class AttrDict(dict):
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
-            return o.strftime('%Y-%m-%d %H:%M:%S')
+            return o.strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(o, datetime_date):
-            return o.strftime('%Y-%m-%d')
+            return o.strftime("%Y-%m-%d")
         elif isinstance(o, Decimal):
             return float(o)
 
@@ -104,11 +108,11 @@ class DateTimeEncoder(json.JSONEncoder):
 # 生成指定长度的随机数
 def generate_random_str(length: int = 4, is_digits: bool = True) -> str:
     words = string.digits if is_digits else string.ascii_letters + string.digits
-    return ''.join(random.sample(words, length))
+    return "".join(random.sample(words, length))
 
 
 def get_request_real_ip(headers: dict):
-    x_real_ip = headers.get('x-forwarded-for')
+    x_real_ip = headers.get("x-forwarded-for")
     if not x_real_ip:
-        x_real_ip = headers.get('x-real-ip', '')
-    return x_real_ip.split(',')[0]
+        x_real_ip = headers.get("x-real-ip", "")
+    return x_real_ip.split(",")[0]

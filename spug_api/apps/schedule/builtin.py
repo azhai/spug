@@ -16,8 +16,8 @@ from threading import Thread
 def auto_run_by_day():
     close_old_connections()
     date = datetime.now() - timedelta(days=30)
-    History.objects.filter(created_at__lt=date.strftime('%Y-%m-%d')).delete()
-    Alarm.objects.filter(created_at__lt=date.strftime('%Y-%m-%d')).delete()
+    History.objects.filter(created_at__lt=date.strftime("%Y-%m-%d")).delete()
+    Alarm.objects.filter(created_at__lt=date.strftime("%Y-%m-%d")).delete()
     try:
         record = ExecHistory.objects.all()[50]
         ExecHistory.objects.filter(id__lt=record.id).delete()
@@ -34,12 +34,12 @@ def auto_run_by_day():
 def auto_run_by_minute():
     close_old_connections()
     now = datetime.now()
-    for req in DeployRequest.objects.filter(status='2'):
+    for req in DeployRequest.objects.filter(status="2"):
         if (now - parse_time(req.do_at)).seconds > 3600:
-            req.status = '-3'
+            req.status = "-3"
             req.save()
-    for req in DeployRequest.objects.filter(status='1', plan__lte=now):
-        req.status = '2'
+    for req in DeployRequest.objects.filter(status="1", plan__lte=now):
+        req.status = "2"
         req.do_at = human_datetime()
         req.do_by = req.created_by
         req.save()

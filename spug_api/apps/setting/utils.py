@@ -13,7 +13,7 @@ class AppSetting:
     def get(cls, key):
         info = Setting.objects.filter(key=key).first()
         if not info:
-            raise KeyError(f'no such key for {key!r}')
+            raise KeyError(f"no such key for {key!r}")
         return info.real_val
 
     @classmethod
@@ -27,16 +27,18 @@ class AppSetting:
     def set(cls, key, value, desc=None):
         if key in KEYS_DEFAULT:
             value = json.dumps(value)
-            Setting.objects.update_or_create(key=key, defaults={'value': value, 'desc': desc})
+            Setting.objects.update_or_create(
+                key=key, defaults={"value": value, "desc": desc}
+            )
         else:
-            raise KeyError('invalid key')
+            raise KeyError("invalid key")
 
     @classmethod
     def get_ssh_key(cls):
-        public_key = cls.get_default('public_key')
-        private_key = cls.get_default('private_key')
+        public_key = cls.get_default("public_key")
+        private_key = cls.get_default("private_key")
         if not private_key or not public_key:
             private_key, public_key = SSH.generate_key()
-            cls.set('private_key', private_key)
-            cls.set('public_key', public_key)
+            cls.set("private_key", private_key)
+            cls.set("public_key", public_key)
         return private_key, public_key

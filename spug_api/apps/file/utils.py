@@ -26,48 +26,42 @@ def parse_mode(obj):
     if obj.st_mode:
         mt = stat.S_IFMT(obj.st_mode)
         if mt == stat.S_IFIFO:
-            kind = 'p'
+            kind = "p"
         elif mt == stat.S_IFCHR:
-            kind = 'c'
+            kind = "c"
         elif mt == stat.S_IFDIR:
-            kind = 'd'
+            kind = "d"
         elif mt == stat.S_IFBLK:
-            kind = 'b'
+            kind = "b"
         elif mt == stat.S_IFREG:
-            kind = '-'
+            kind = "-"
         elif mt == stat.S_IFLNK:
-            kind = 'l'
+            kind = "l"
         elif mt == stat.S_IFSOCK:
-            kind = 's'
+            kind = "s"
         else:
-            kind = '?'
-        code = obj._rwx(
-            (obj.st_mode & 448) >> 6, obj.st_mode & stat.S_ISUID
-        )
-        code += obj._rwx(
-            (obj.st_mode & 56) >> 3, obj.st_mode & stat.S_ISGID
-        )
-        code += obj._rwx(
-            obj.st_mode & 7, obj.st_mode & stat.S_ISVTX, True
-        )
+            kind = "?"
+        code = obj._rwx((obj.st_mode & 448) >> 6, obj.st_mode & stat.S_ISUID)
+        code += obj._rwx((obj.st_mode & 56) >> 3, obj.st_mode & stat.S_ISGID)
+        code += obj._rwx(obj.st_mode & 7, obj.st_mode & stat.S_ISVTX, True)
         return kind + code
     else:
-        return '?---------'
+        return "?---------"
 
 
 def format_size(size):
     if size:
         if size < KB:
-            return f'{size}B'
+            return f"{size}B"
         if size < MB:
-            return f'{size / KB:.1f}K'
+            return f"{size / KB:.1f}K"
         if size < GB:
-            return f'{size / MB:.1f}M'
+            return f"{size / MB:.1f}M"
         if size < TB:
-            return f'{size / GB:.1f}G'
-        return f'{size / TB:.1f}T'
+            return f"{size / GB:.1f}G"
+        return f"{size / TB:.1f}T"
     else:
-        return ''
+        return ""
 
 
 def fetch_dir_list(host, path):
@@ -75,7 +69,7 @@ def fetch_dir_list(host, path):
         objects = []
         for item in ssh.list_dir_attr(path):
             code = parse_mode(item)
-            kind, is_link, name = '?', False, getattr(item, 'filename', '?')
+            kind, is_link, name = "?", False, getattr(item, "filename", "?")
             if stat.S_ISLNK(item.st_mode):
                 is_link = True
                 try:
@@ -83,19 +77,21 @@ def fetch_dir_list(host, path):
                 except FileNotFoundError:
                     pass
             if stat.S_ISREG(item.st_mode):
-                kind = '-'
+                kind = "-"
             elif stat.S_ISDIR(item.st_mode):
-                kind = 'd'
-            if (item.st_mtime is None) or (item.st_mtime == int(0xffffffff)):
-                date = '(unknown date)'
+                kind = "d"
+            if (item.st_mtime is None) or (item.st_mtime == int(0xFFFFFFFF)):
+                date = "(unknown date)"
             else:
-                date = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(item.st_mtime))
-            objects.append({
-                'name': name,
-                'size': '' if kind == 'd' else format_size(item.st_size or ''),
-                'date': date,
-                'kind': kind,
-                'code': code,
-                'is_link': is_link
-            })
+                date = time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(item.st_mtime))
+            objects.append(
+                {
+                    "name": name,
+                    "size": "" if kind == "d" else format_size(item.st_size or ""),
+                    "date": date,
+                    "kind": kind,
+                    "code": code,
+                    "is_link": is_link,
+                }
+            )
     return objects

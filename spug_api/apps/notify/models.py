@@ -10,13 +10,13 @@ import time
 
 class Notify(models.Model, ModelMixin):
     TYPES = (
-        ('1', '通知'),
-        ('2', '待办'),
+        ("1", "通知"),
+        ("2", "待办"),
     )
     SOURCES = (
-        ('monitor', '监控中心'),
-        ('schedule', '任务计划'),
-        ('flag', '应用发布'),
+        ("monitor", "监控中心"),
+        ("schedule", "任务计划"),
+        ("flag", "应用发布"),
     )
     title = models.CharField(max_length=255)
     source = models.CharField(max_length=10, choices=SOURCES)
@@ -29,14 +29,14 @@ class Notify(models.Model, ModelMixin):
 
     @classmethod
     def make_notify(cls, source, type, title, content=None, with_quiet=True):
-        if not with_quiet or time.time() - cache.get('spug:notify_quiet', 0) > 3600:
-            cache.set('spug:notify_quiet', time.time())
+        if not with_quiet or time.time() - cache.get("spug:notify_quiet", 0) > 3600:
+            cache.set("spug:notify_quiet", time.time())
             cls.objects.create(source=source, title=title, type=type, content=content)
         Channel.send_notify(title, content)
 
     def __repr__(self):
-        return '<Notify %r>' % self.title
+        return "<Notify %r>" % self.title
 
     class Meta:
-        db_table = 'notifies'
-        ordering = ('-id',)
+        db_table = "notifies"
+        ordering = ("-id",)

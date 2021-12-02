@@ -14,14 +14,16 @@ import json
 
 def local_executor(command):
     code, out, now = 1, None, time.time()
-    task = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     try:
         code = task.wait(3600)
         out = task.stdout.read() + task.stderr.read()
         out = out.decode()
     except subprocess.TimeoutExpired:
         # task.kill()
-        out = 'timeout, wait more than 1 hour'
+        out = "timeout, wait more than 1 hour"
     return code, round(time.time() - now, 3), out
 
 
@@ -31,21 +33,21 @@ def host_executor(host, command):
         with host.get_ssh() as ssh:
             code, out = ssh.exec_command_raw(command)
     except AuthenticationException:
-        out = 'ssh authentication fail'
+        out = "ssh authentication fail"
     except socket.error as e:
-        out = f'network error {e}'
+        out = f"network error {e}"
     return code, round(time.time() - now, 3), out
 
 
 def schedule_worker_handler(job):
     history_id, host_id, command = json.loads(job)
-    if host_id == 'local':
+    if host_id == "local":
         code, duration, out = local_executor(command)
     else:
         close_old_connections()
         host = Host.objects.filter(pk=host_id).first()
         if not host:
-            code, duration, out = 1, 0, f'unknown host id for {host_id!r}'
+            code, duration, out = 1, 0, f"unknown host id for {host_id!r}"
         else:
             code, duration, out = host_executor(host, command)
     close_old_connections()
@@ -55,8 +57,8 @@ def schedule_worker_handler(job):
         output[str(host_id)] = [code, duration, out]
         history.output = json.dumps(output)
         if all(output.values()):
-            history.status = '1' if sum(x[0] for x in output.values()) == 0 else '2'
+            history.status = "1" if sum(x[0] for x in output.values()) == 0 else "2"
         history.save()
-    if history.status == '2':
+    if history.status == "2":
         task = Task.objects.get(pk=history.task_id)
         send_fail_notify(task)

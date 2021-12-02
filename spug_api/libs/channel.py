@@ -15,9 +15,5 @@ class Channel:
 
     @staticmethod
     def send_notify(title, content):
-        message = {
-            'type': 'notify.message',
-            'title': title,
-            'content': content
-        }
-        async_to_sync(layer.group_send)('notify', message)
+        message = {"type": "notify.message", "title": title, "content": content}
+        async_to_sync(layer.group_send)("notify", message)

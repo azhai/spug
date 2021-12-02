@@ -1,7 +1,13 @@
 # Copyright: (c) OpenSpug Organization. https://github.com/openspug/spug
 # Copyright: (c) <spug.dev@gmail.com>
 # Released under the AGPL-3.0 License.
-from git import Repo, RemoteReference, TagReference, InvalidGitRepositoryError, GitCommandError
+from git import (
+    Repo,
+    RemoteReference,
+    TagReference,
+    InvalidGitRepositoryError,
+    GitCommandError,
+)
 from tempfile import NamedTemporaryFile
 from datetime import datetime
 import shutil
@@ -18,7 +24,7 @@ class Git:
         self.env = {}
 
     def archive(self, filepath, commit):
-        with open(filepath, 'wb') as f:
+        with open(filepath, "wb") as f:
             self.repo.archive(f, commit)
 
     def fetch_branches_tags(self):
@@ -26,21 +32,27 @@ class Git:
         branches, tags = {}, {}
         for ref in self.repo.references:
             if isinstance(ref, RemoteReference):
-                if ref.remote_head != 'HEAD':
-                    branches[ref.remote_head] = self._get_commits(f'origin/{ref.remote_head}', 30)
+                if ref.remote_head != "HEAD":
+                    branches[ref.remote_head] = self._get_commits(
+                        f"origin/{ref.remote_head}", 30
+                    )
             elif isinstance(ref, TagReference):
-                tags[ref.name] = {
-                    'id': ref.tag.hexsha,
-                    'author': ref.tag.tagger.name,
-                    'date': self._format_date(ref.tag.tagged_date),
-                    'message': ref.tag.message.strip()
-                } if ref.tag else {
-                    'id': ref.commit.binsha.hex(),
-                    'author': ref.commit.author.name,
-                    'date': self._format_date(ref.commit.authored_date),
-                    'message': ref.commit.message.strip()
-                }
-        tags = sorted(tags.items(), key=lambda x: x[1]['date'], reverse=True)
+                tags[ref.name] = (
+                    {
+                        "id": ref.tag.hexsha,
+                        "author": ref.tag.tagger.name,
+                        "date": self._format_date(ref.tag.tagged_date),
+                        "message": ref.tag.message.strip(),
+                    }
+                    if ref.tag
+                    else {
+                        "id": ref.commit.binsha.hex(),
+                        "author": ref.commit.author.name,
+                        "date": self._format_date(ref.commit.authored_date),
+                        "message": ref.commit.message.strip(),
+                    }
+                )
+        tags = sorted(tags.items(), key=lambda x: x[1]["date"], reverse=True)
         return branches, dict(tags)
 
     def fetch(self):
@@ -75,18 +87,20 @@ class Git:
         for commit in self.repo.iter_commits(branch):
             if len(commits) == count:
                 break
-            commits.append({
-                'id': commit.hexsha,
-                'author': commit.author.name,
-                'date': self._format_date(commit.committed_date),
-                'message': commit.message.strip()
-            })
+            commits.append(
+                {
+                    "id": commit.hexsha,
+                    "author": commit.author.name,
+                    "date": self._format_date(commit.committed_date),
+                    "message": commit.message.strip(),
+                }
+            )
         return commits
 
     def _format_date(self, timestamp):
         if isinstance(timestamp, int):
             date = datetime.fromtimestamp(timestamp)
-            return date.strftime('%Y-%m-%d %H:%M')
+            return date.strftime("%Y-%m-%d %H:%M")
         return timestamp
 
     def __enter__(self):
@@ -94,7 +108,7 @@ class Git:
             self.fd = NamedTemporaryFile()
             self.fd.write(self.pkey.encode())
             self.fd.flush()
-            self.env = {'GIT_SSH_COMMAND': f'ssh -i {self.fd.name}'}
+            self.env = {"GIT_SSH_COMMAND": f"ssh -i {self.fd.name}"}
         self.repo = self._get_repo()
         return self
 

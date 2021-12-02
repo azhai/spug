@@ -15,11 +15,11 @@ class Environment(models.Model, ModelMixin):
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __repr__(self):
-        return f'<Environment {self.name!r}>'
+        return f"<Environment {self.name!r}>"
 
     class Meta:
-        db_table = 'environments'
-        ordering = ('-sort_id',)
+        db_table = "environments"
+        ordering = ("-sort_id",)
 
 
 class Service(models.Model, ModelMixin):
@@ -30,18 +30,15 @@ class Service(models.Model, ModelMixin):
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __repr__(self):
-        return f'<Service {self.name!r}>'
+        return f"<Service {self.name!r}>"
 
     class Meta:
-        db_table = 'services'
-        ordering = ('-id',)
+        db_table = "services"
+        ordering = ("-id",)
 
 
 class Config(models.Model, ModelMixin):
-    TYPES = (
-        ('app', 'App'),
-        ('src', 'Service')
-    )
+    TYPES = (("app", "App"), ("src", "Service"))
     type = models.CharField(max_length=5, choices=TYPES)
     o_id = models.IntegerField()
     key = models.CharField(max_length=50)
@@ -53,19 +50,15 @@ class Config(models.Model, ModelMixin):
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __repr__(self):
-        return f'<Config {self.key!r}>'
+        return f"<Config {self.key!r}>"
 
     class Meta:
-        db_table = 'configs'
-        ordering = ('-key',)
+        db_table = "configs"
+        ordering = ("-key",)
 
 
 class ConfigHistory(models.Model, ModelMixin):
-    ACTIONS = (
-        ('1', '新增'),
-        ('2', '更新'),
-        ('3', '删除')
-    )
+    ACTIONS = (("1", "新增"), ("2", "更新"), ("3", "删除"))
     type = models.CharField(max_length=5)
     o_id = models.IntegerField()
     key = models.CharField(max_length=50)
@@ -79,8 +72,8 @@ class ConfigHistory(models.Model, ModelMixin):
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __repr__(self):
-        return f'<ConfigHistory {self.key!r}>'
+        return f"<ConfigHistory {self.key!r}>"
 
     class Meta:
-        db_table = 'config_histories'
-        ordering = ('key',)
+        db_table = "config_histories"
+        ordering = ("key",)

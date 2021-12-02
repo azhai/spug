@@ -9,15 +9,15 @@ import json
 
 class Alarm(models.Model, ModelMixin):
     MODES = (
-        ('1', '微信'),
-        ('2', '短信'),
-        ('3', '钉钉'),
-        ('4', '邮件'),
-        ('5', '企业微信'),
+        ("1", "微信"),
+        ("2", "短信"),
+        ("3", "钉钉"),
+        ("4", "邮件"),
+        ("5", "企业微信"),
     )
     STATUS = (
-        ('1', '报警发生'),
-        ('2', '故障恢复'),
+        ("1", "报警发生"),
+        ("2", "故障恢复"),
     )
     name = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
@@ -30,17 +30,19 @@ class Alarm(models.Model, ModelMixin):
 
     def to_dict(self, *args, **kwargs):
         tmp = super().to_dict(*args, **kwargs)
-        tmp['notify_mode'] = ','.join(dict(self.MODES)[x] for x in json.loads(self.notify_mode))
-        tmp['notify_grp'] = json.loads(self.notify_grp)
-        tmp['status_alias'] = self.get_status_display()
+        tmp["notify_mode"] = ",".join(
+            dict(self.MODES)[x] for x in json.loads(self.notify_mode)
+        )
+        tmp["notify_grp"] = json.loads(self.notify_grp)
+        tmp["status_alias"] = self.get_status_display()
         return tmp
 
     def __repr__(self):
-        return '<Alarm %r>' % self.name
+        return "<Alarm %r>" % self.name
 
     class Meta:
-        db_table = 'alarms'
-        ordering = ('-id',)
+        db_table = "alarms"
+        ordering = ("-id",)
 
 
 class Group(models.Model, ModelMixin):
@@ -48,19 +50,19 @@ class Group(models.Model, ModelMixin):
     desc = models.CharField(max_length=255, null=True)
     contacts = models.TextField(null=True)
     created_at = models.CharField(max_length=20, default=human_datetime)
-    created_by = models.ForeignKey(User, models.PROTECT, related_name='+')
+    created_by = models.ForeignKey(User, models.PROTECT, related_name="+")
 
     def to_dict(self, *args, **kwargs):
         tmp = super().to_dict(*args, **kwargs)
-        tmp['contacts'] = json.loads(self.contacts)
+        tmp["contacts"] = json.loads(self.contacts)
         return tmp
 
     def __repr__(self):
-        return '<AlarmGroup %r>' % self.name
+        return "<AlarmGroup %r>" % self.name
 
     class Meta:
-        db_table = 'alarm_groups'
-        ordering = ('-id',)
+        db_table = "alarm_groups"
+        ordering = ("-id",)
 
 
 class Contact(models.Model, ModelMixin):
@@ -72,11 +74,11 @@ class Contact(models.Model, ModelMixin):
     qy_wx = models.CharField(max_length=255, null=True)
 
     created_at = models.CharField(max_length=20, default=human_datetime)
-    created_by = models.ForeignKey(User, models.PROTECT, related_name='+')
+    created_by = models.ForeignKey(User, models.PROTECT, related_name="+")
 
     def __repr__(self):
-        return '<AlarmContact %r>' % self.name
+        return "<AlarmContact %r>" % self.name
 
     class Meta:
-        db_table = 'alarm_contacts'
-        ordering = ('-id',)
+        db_table = "alarm_contacts"
+        ordering = ("-id",)

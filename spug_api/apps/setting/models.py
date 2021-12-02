@@ -6,14 +6,14 @@ from libs import ModelMixin
 import json
 
 KEYS_DEFAULT = {
-    'MFA': {'enable': False},
-    'verify_ip': True,
-    'ldap_service': {},
-    'spug_key': None,
-    'api_key': None,
-    'mail_service': {},
-    'private_key': None,
-    'public_key': None,
+    "MFA": {"enable": False},
+    "verify_ip": True,
+    "ldap_service": {},
+    "spug_key": None,
+    "api_key": None,
+    "mail_service": {},
+    "private_key": None,
+    "public_key": None,
 }
 
 
@@ -23,8 +23,8 @@ class Setting(models.Model, ModelMixin):
     desc = models.CharField(max_length=255, null=True)
 
     def to_view(self):
-        tmp = self.to_dict(selects=('key',))
-        tmp['value'] = self.real_val
+        tmp = self.to_dict(selects=("key",))
+        tmp["value"] = self.real_val
         return tmp
 
     @property
@@ -35,7 +35,7 @@ class Setting(models.Model, ModelMixin):
             return KEYS_DEFAULT.get(self.key)
 
     def __repr__(self):
-        return '<Setting %r>' % self.key
+        return "<Setting %r>" % self.key
 
     class Meta:
-        db_table = 'settings'
+        db_table = "settings"

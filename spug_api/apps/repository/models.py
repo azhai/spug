@@ -13,10 +13,10 @@ import os
 
 class Repository(models.Model, ModelMixin):
     STATUS = (
-        ('0', '未开始'),
-        ('1', '构建中'),
-        ('2', '失败'),
-        ('5', '成功'),
+        ("0", "未开始"),
+        ("1", "构建中"),
+        ("2", "失败"),
+        ("5", "成功"),
     )
     app = models.ForeignKey(App, on_delete=models.PROTECT)
     env = models.ForeignKey(Environment, on_delete=models.PROTECT)
@@ -25,7 +25,7 @@ class Repository(models.Model, ModelMixin):
     spug_version = models.CharField(max_length=50)
     remarks = models.CharField(max_length=255, null=True)
     extra = models.TextField()
-    status = models.CharField(max_length=2, choices=STATUS, default='0')
+    status = models.CharField(max_length=2, choices=STATUS, default="0")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
@@ -35,24 +35,24 @@ class Repository(models.Model, ModelMixin):
 
     def to_view(self):
         tmp = self.to_dict()
-        tmp['extra'] = json.loads(self.extra)
-        tmp['status_alias'] = self.get_status_display()
-        if hasattr(self, 'app_name'):
-            tmp['app_name'] = self.app_name
-        if hasattr(self, 'env_name'):
-            tmp['env_name'] = self.env_name
-        if hasattr(self, 'created_by_user'):
-            tmp['created_by_user'] = self.created_by_user
+        tmp["extra"] = json.loads(self.extra)
+        tmp["status_alias"] = self.get_status_display()
+        if hasattr(self, "app_name"):
+            tmp["app_name"] = self.app_name
+        if hasattr(self, "env_name"):
+            tmp["env_name"] = self.env_name
+        if hasattr(self, "created_by_user"):
+            tmp["created_by_user"] = self.created_by_user
         return tmp
 
     def delete(self, using=None, keep_parents=False):
         super().delete(using, keep_parents)
         try:
-            build_file = f'{self.spug_version}.tar.gz'
+            build_file = f"{self.spug_version}.tar.gz"
             os.remove(os.path.join(settings.BUILD_DIR, build_file))
         except FileNotFoundError:
             pass
 
     class Meta:
-        db_table = 'repositories'
-        ordering = ('-id',)
+        db_table = "repositories"
+        ordering = ("-id",)

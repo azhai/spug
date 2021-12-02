@@ -6,7 +6,7 @@ from django.conf.urls import url
 from .views import *
 
 urlpatterns = [
-    url(r'template/$', TemplateView.as_view()),
-    url(r'history/$', get_histories),
-    url(r'do/$', do_task),
+    url(r"template/$", TemplateView.as_view()),
+    url(r"history/$", get_histories),
+    url(r"do/$", do_task),
 ]

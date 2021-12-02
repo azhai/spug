@@ -12,25 +12,25 @@ class ExecTemplate(models.Model, ModelMixin):
     type = models.CharField(max_length=50)
     body = models.TextField()
     interpreter = models.CharField(max_length=20)
-    host_ids = models.TextField(default='[]')
+    host_ids = models.TextField(default="[]")
     desc = models.CharField(max_length=255, null=True)
 
     created_at = models.CharField(max_length=20, default=human_datetime)
-    created_by = models.ForeignKey(User, models.PROTECT, related_name='+')
+    created_by = models.ForeignKey(User, models.PROTECT, related_name="+")
     updated_at = models.CharField(max_length=20, null=True)
-    updated_by = models.ForeignKey(User, models.PROTECT, related_name='+', null=True)
+    updated_by = models.ForeignKey(User, models.PROTECT, related_name="+", null=True)
 
     def __repr__(self):
-        return '<ExecTemplate %r>' % self.name
+        return "<ExecTemplate %r>" % self.name
 
     def to_view(self):
         tmp = self.to_dict()
-        tmp['host_ids'] = json.loads(self.host_ids)
+        tmp["host_ids"] = json.loads(self.host_ids)
         return tmp
 
     class Meta:
-        db_table = 'exec_templates'
-        ordering = ('-id',)
+        db_table = "exec_templates"
+        ordering = ("-id",)
 
 
 class ExecHistory(models.Model, ModelMixin):
@@ -43,9 +43,9 @@ class ExecHistory(models.Model, ModelMixin):
 
     def to_view(self):
         tmp = self.to_dict()
-        tmp['host_ids'] = json.loads(self.host_ids)
+        tmp["host_ids"] = json.loads(self.host_ids)
         return tmp
 
     class Meta:
-        db_table = 'exec_histories'
-        ordering = ('-updated_at',)
+        db_table = "exec_histories"
+        ordering = ("-updated_at",)

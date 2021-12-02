@@ -26,8 +26,10 @@ class Mail:
 
     def send_text_mail(self, receivers, subject, body):
         server = self.get_server()
-        msg = MIMEText(body, 'plain', 'utf-8')
-        msg['Subject'] = Header(subject, 'utf-8')
-        msg['From'] = formataddr((self.nickname, self.user)) if self.nickname else self.user
+        msg = MIMEText(body, "plain", "utf-8")
+        msg["Subject"] = Header(subject, "utf-8")
+        msg["From"] = (
+            formataddr((self.nickname, self.user)) if self.nickname else self.user
+        )
         server.sendmail(self.user, receivers, msg.as_string())
         server.quit()

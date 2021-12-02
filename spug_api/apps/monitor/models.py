@@ -9,15 +9,15 @@ import json
 
 class Detection(models.Model, ModelMixin):
     TYPES = (
-        ('1', '站点检测'),
-        ('2', '端口检测'),
-        ('3', '进程检测'),
-        ('4', '自定义脚本'),
-        ('5', 'Ping检测'),
+        ("1", "站点检测"),
+        ("2", "端口检测"),
+        ("3", "进程检测"),
+        ("4", "自定义脚本"),
+        ("5", "Ping检测"),
     )
     STATUS = (
-        (0, '正常'),
-        (1, '异常'),
+        (0, "正常"),
+        (1, "异常"),
     )
     name = models.CharField(max_length=50)
     type = models.CharField(max_length=2, choices=TYPES)
@@ -35,21 +35,21 @@ class Detection(models.Model, ModelMixin):
     latest_run_time = models.CharField(max_length=20, null=True)
 
     created_at = models.CharField(max_length=20, default=human_datetime)
-    created_by = models.ForeignKey(User, models.PROTECT, related_name='+')
+    created_by = models.ForeignKey(User, models.PROTECT, related_name="+")
     updated_at = models.CharField(max_length=20, null=True)
-    updated_by = models.ForeignKey(User, models.PROTECT, related_name='+', null=True)
+    updated_by = models.ForeignKey(User, models.PROTECT, related_name="+", null=True)
 
     def to_view(self):
         tmp = self.to_dict()
-        tmp['type_alias'] = self.get_type_display()
-        tmp['notify_mode'] = json.loads(self.notify_mode)
-        tmp['notify_grp'] = json.loads(self.notify_grp)
-        tmp['targets'] = json.loads(self.targets)
+        tmp["type_alias"] = self.get_type_display()
+        tmp["notify_mode"] = json.loads(self.notify_mode)
+        tmp["notify_grp"] = json.loads(self.notify_grp)
+        tmp["targets"] = json.loads(self.targets)
         return tmp
 
     def __repr__(self):
-        return '<Detection %r>' % self.name
+        return "<Detection %r>" % self.name
 
     class Meta:
-        db_table = 'detections'
-        ordering = ('-id',)
+        db_table = "detections"
+        ordering = ("-id",)

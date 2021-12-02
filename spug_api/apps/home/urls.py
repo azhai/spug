@@ -8,10 +8,10 @@ from apps.home.notice import NoticeView
 from apps.home.navigation import NavView
 
 urlpatterns = [
-    path('statistic/', get_statistic),
-    path('alarm/', get_alarm),
-    path('deploy/', get_deploy),
-    path('request/', get_request),
-    path('notice/', NoticeView.as_view()),
-    path('navigation/', NavView.as_view()),
+    path("statistic/", get_statistic),
+    path("alarm/", get_alarm),
+    path("deploy/", get_deploy),
+    path("request/", get_request),
+    path("notice/", NoticeView.as_view()),
+    path("navigation/", NavView.as_view()),
 ]

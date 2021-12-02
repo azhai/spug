@@ -15,7 +15,7 @@ import json
 class ExecConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.token = self.scope['url_route']['kwargs']['token']
+        self.token = self.scope["url_route"]["kwargs"]["token"]
         self.rds = get_redis_connection()
 
     def connect(self):
@@ -34,22 +34,22 @@ class ExecConsumer(WebsocketConsumer):
             data = response.decode()
             self.send(text_data=data)
             response = self.get_response()
-        self.send(text_data='pong')
+        self.send(text_data="pong")
 
 
 class ComConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        token = self.scope['url_route']['kwargs']['token']
-        module = self.scope['url_route']['kwargs']['module']
-        if module == 'build':
-            self.key = f'{settings.BUILD_KEY}:{token}'
-        elif module == 'request':
-            self.key = f'{settings.REQUEST_KEY}:{token}'
-        elif module == 'host':
+        token = self.scope["url_route"]["kwargs"]["token"]
+        module = self.scope["url_route"]["kwargs"]["module"]
+        if module == "build":
+            self.key = f"{settings.BUILD_KEY}:{token}"
+        elif module == "request":
+            self.key = f"{settings.REQUEST_KEY}:{token}"
+        elif module == "host":
             self.key = token
         else:
-            raise TypeError(f'unknown module for {module}')
+            raise TypeError(f"unknown module for {module}")
         self.rds = get_redis_connection()
 
     def connect(self):
@@ -67,7 +67,7 @@ class ComConsumer(WebsocketConsumer):
             counter += 1
             time.sleep(0.2)
 
-    def receive(self, text_data='', **kwargs):
+    def receive(self, text_data="", **kwargs):
         if text_data.isdigit():
             index = int(text_data)
             response = self.get_response(index)
@@ -75,14 +75,14 @@ class ComConsumer(WebsocketConsumer):
                 index += 1
                 self.send(text_data=response)
                 response = self.get_response(index)
-        self.send(text_data='pong')
+        self.send(text_data="pong")
 
 
 class SSHConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = self.scope['user']
-        self.id = self.scope['url_route']['kwargs']['id']
+        self.user = self.scope["user"]
+        self.id = self.scope["url_route"]["kwargs"]["id"]
         self.chan = None
         self.ssh = None
 
@@ -100,11 +100,11 @@ class SSHConsumer(WebsocketConsumer):
         if data and self.chan:
             data = json.loads(data)
             # print('write: {!r}'.format(data))
-            resize = data.get('resize')
+            resize = data.get("resize")
             if resize and len(resize) == 2:
                 self.chan.resize_pty(*resize)
             else:
-                self.chan.send(data['data'])
+                self.chan.send(data["data"])
 
     def disconnect(self, code):
         self.chan.close()
@@ -119,32 +119,32 @@ class SSHConsumer(WebsocketConsumer):
             self.close()
 
     def _init(self):
-        self.send(bytes_data=b'\r\33[KConnecting ...\r')
+        self.send(bytes_data=b"\r\33[KConnecting ...\r")
         host = Host.objects.filter(pk=self.id).first()
         if not host:
-            self.send(text_data='Unknown host\r\n')
+            self.send(text_data="Unknown host\r\n")
             self.close()
         try:
             self.ssh = host.get_ssh().get_client()
         except Exception as e:
-            self.send(bytes_data=f'Exception: {e}\r\n'.encode())
+            self.send(bytes_data=f"Exception: {e}\r\n".encode())
             self.close()
             return
-        self.chan = self.ssh.invoke_shell(term='xterm')
+        self.chan = self.ssh.invoke_shell(term="xterm")
         self.chan.transport.set_keepalive(30)
         Thread(target=self.loop_read).start()
 
 
 class NotifyConsumer(WebsocketConsumer):
     def connect(self):
-        async_to_sync(self.channel_layer.group_add)('notify', self.channel_name)
+        async_to_sync(self.channel_layer.group_add)("notify", self.channel_name)
         self.accept()
 
     def disconnect(self, code):
-        async_to_sync(self.channel_layer.group_discard)('notify', self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)("notify", self.channel_name)
 
     def receive(self, **kwargs):
-        self.send(text_data='pong')
+        self.send(text_data="pong")
 
     def notify_message(self, event):
         self.send(text_data=json.dumps(event))
