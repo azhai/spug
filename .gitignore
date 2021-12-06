@@ -22,6 +22,6 @@ _project
 *.egg-info/
 */__pycache__/
 
-spug_api/spug/overrides.py
+#spug_api/spug/overrides.py
 spug_web/build/
 spug_web/node_modules/
