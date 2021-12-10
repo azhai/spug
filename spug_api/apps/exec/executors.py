@@ -14,18 +14,7 @@ def exec_worker_handler(job):
 
 
 class Job:
-    def __init__(
-        self,
-        key,
-        name,
-        hostname,
-        port,
-        username,
-        pkey,
-        command,
-        interpreter,
-        token=None,
-    ):
+    def __init__(self, key, name, hostname, port, username, pkey, command, interpreter, token=None):
         self.ssh = SSH(hostname, port, username, pkey)
         self.key = key
         self.command = self._handle_command(command, interpreter)
@@ -37,7 +26,7 @@ class Job:
             SPUG_HOST_HOSTNAME=hostname,
             SPUG_SSH_PORT=str(port),
             SPUG_SSH_USERNAME=username,
-            SPUG_INTERPRETER=interpreter,
+            SPUG_INTERPRETER=interpreter
         )
 
     def _send(self, message, with_expire=False):
@@ -48,36 +37,34 @@ class Job:
             self.rds_cli.expire(self.token, 300)
 
     def _handle_command(self, command, interpreter):
-        if interpreter == "python":
-            return f"python << EOF\n{command}\nEOF"
+        if interpreter == 'python':
+            return f'python << EOF\n# -*- coding: UTF-8 -*-\n{command}\nEOF'
         return command
 
     def send(self, data):
-        message = {"key": self.key, "data": data}
+        message = {'key': self.key, 'data': data}
         self._send(message)
 
     def send_status(self, code):
-        message = {"key": self.key, "status": code}
+        message = {'key': self.key, 'status': code}
         self._send(message, True)
 
     def run(self):
         if not self.token:
             with self.ssh:
                 return self.ssh.exec_command(self.command, self.env)
-        self.send("\r\33[K\x1b[36m### Executing ...\x1b[0m\r\n")
+        self.send('\r\n\x1b[36m### Executing ...\x1b[0m\r\n')
         code = -1
         try:
             with self.ssh:
-                for code, out in self.ssh.exec_command_with_stream(
-                    self.command, self.env
-                ):
+                for code, out in self.ssh.exec_command_with_stream(self.command, self.env):
                     self.send(out)
         except socket.timeout:
             code = 130
-            self.send("\r\n\x1b[31m### Time out\x1b[0m")
+            self.send('\r\n\x1b[31m### Time out\x1b[0m')
         except Exception as e:
             code = 131
-            self.send(f"\r\n\x1b[31m### Exception {e}\x1b[0m")
+            self.send(f'\r\n\x1b[31m### Exception {e}\x1b[0m')
             raise e
         finally:
             self.send_status(code)
