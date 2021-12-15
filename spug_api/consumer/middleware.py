@@ -19,7 +19,7 @@ class AuthMiddleware:
             raise ValueError(
                 "You cannot use AuthMiddleware on a non-WebSocket connection"
             )
-        headers = dict(scope.get("headers", []))
+        headers = dict(scope.get('headers', []))
         is_ok, message = self.verify_user(scope, headers)
         if is_ok:
             return self.application(scope)
@@ -29,25 +29,20 @@ class AuthMiddleware:
 
     def get_real_ip(self, headers):
         decode_headers = {
-            "x-forwarded-for": headers.get(b"x-forwarded-for", b"").decode(),
-            "x-real-ip": headers.get(b"x-real-ip", b"").decode(),
+            'x-forwarded-for': headers.get(b'x-forwarded-for', b'').decode(),
+            'x-real-ip': headers.get(b'x-real-ip', b'').decode()
         }
         return get_request_real_ip(decode_headers)
 
     def verify_user(self, scope, headers):
         close_old_connections()
-        query_string = scope["query_string"].decode()
+        query_string = scope['query_string'].decode()
         x_real_ip = self.get_real_ip(headers)
-        token = parse_qs(query_string).get("x-token", [""])[0]
+        token = parse_qs(query_string).get('x-token', [''])[0]
         if token and len(token) == 32:
             user = User.objects.filter(access_token=token).first()
-            if (
-                user
-                and x_real_ip == user.last_ip
-                and user.token_expired >= time.time()
-                and user.is_active
-            ):
-                scope["user"] = user
+            if user and x_real_ip == user.last_ip and user.token_expired >= time.time() and user.is_active:
+                scope['user'] = user
                 return True, None
-            return False, f"Verify failed: {x_real_ip} <> {user.last_ip}"
-        return False, "Token is invalid"
+            return False, f'Verify failed: {x_real_ip} <> {user.last_ip if user else None}'
+        return False, 'Token is invalid'
